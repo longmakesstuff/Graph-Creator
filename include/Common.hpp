@@ -27,6 +27,7 @@ typedef struct Config {
     fpt centerY;
     fpt xTick;
     fpt yTick;
+    fpt gridSize;
 } Config;
 
 /* Maths */

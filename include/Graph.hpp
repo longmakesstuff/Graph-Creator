@@ -9,13 +9,15 @@ private:
     sf::RenderWindow *window;
     Config *config;
     sf::Vector2f center;
-    sf::Vector2f middleMouseClickedPosition;
     sf::Event event;
-    bool middleMousePressed;
+    sf::Clock clock;
+    fpt timeElapsed = 0;
 
     void drawAxes();
 
     void drawTicks();
+
+    void drawGrids();
 
     void translateGraph();
 

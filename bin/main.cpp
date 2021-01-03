@@ -3,7 +3,7 @@
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Graph Creator", sf::Style::Default);
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(30);
 
     sf::Font arial;
     arial.loadFromFile("arial.ttf");
@@ -12,7 +12,8 @@ int main() {
         .centerX = 100.0f,
         .centerY = 100.0f,
         .xTick = 100.0f,
-        .yTick = 100.0f
+        .yTick = 100.0f,
+        .gridSize = 10.0f
     };
 
     Graph graph(&arial, &window, &config);
