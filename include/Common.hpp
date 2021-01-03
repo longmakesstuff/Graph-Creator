@@ -1,10 +1,12 @@
 #pragma once
 
 #include <cmath>
+#include <iostream>
+#include <SFML/Graphics.hpp>
 
 #define WINDOW_WIDTH 1600
 
-#define WINDOW_HEIGHT 800
+#define WINDOW_HEIGHT 1600
 
 typedef float fpt;
 
@@ -20,8 +22,14 @@ typedef float fpt;
 
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
-/* Maths */
+typedef struct Config {
+    fpt centerX;
+    fpt centerY;
+    fpt xTick;
+    fpt yTick;
+} Config;
 
+/* Maths */
 #define PI                  3.14159265
 #define RAD2DEG(x)          ((x)/PI*180)
 #define DEG2RAD(x)          ((x)*PI/180)
@@ -50,7 +58,6 @@ typedef float fpt;
 #define IS_BETWEEN(n,L,H)   ((unsigned char)((n) >= (L) && (n) <= (H)))
 
 /* BITS */
-
 #define BIT(x)          (1<<(x))
 #define SETBIT(x,p)     ((x)|(1<<(p)))
 #define CLEARBIT(x,p)   ((x)&(~(1<<(p))))
@@ -58,7 +65,6 @@ typedef float fpt;
 #define TOGGLEBIT(x,p)  ((x)^(1<<(p)))
 
 /* ARRAYS */
-
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 #define SET(d, n, v)  do{ size_t i_, n_; \
                       for ( n_ = (n), i_ = 0; n_ > 0; --n_, ++i_) \
@@ -68,8 +74,18 @@ typedef float fpt;
 #define IS_ARRAY(a)   ((void *)&a == (void *)a)
 
 /* STRINGS */
-
 #define STRING char*
 #define STR2(s)             #s
 #define STR(s)              STR2(s)
 #define CAT(str1,str2)      (str1 "" str2)
+
+
+std::ostream &operator<<(std::ostream &os, const sf::Vector2f &vector);
+
+sf::Vector2f operator+(const sf::Vector2f& lhs, fpt scalar);
+
+sf::Vector2f operator-(const sf::Vector2f& lhs, fpt scalar);
+
+sf::Vector2f operator/(const sf::Vector2f& lhs, fpt scalar);
+
+sf::Vector2f operator*(const sf::Vector2f& lhs, fpt scalar);

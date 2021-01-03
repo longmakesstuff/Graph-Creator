@@ -1,19 +1,22 @@
 #include <SFML/Graphics.hpp>
-
-using namespace std;
-using namespace sf;
+#include <Graph.hpp>
 
 int main() {
-    RenderWindow window;
-    window.setFramerateLimit(30);
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Graph Creator", sf::Style::Default);
+    window.setFramerateLimit(60);
 
-    Font arial;
+    sf::Font arial;
     arial.loadFromFile("arial.ttf");
-    Event event;
 
+    Config config{
+        .centerX = 100.0f,
+        .centerY = 100.0f,
+        .xTick = 100.0f,
+        .yTick = 100.0f
+    };
+
+    Graph graph(&arial, &window, &config);
     while (window.isOpen()) {
-        while (window.pollEvent(event)) {}
-
+        graph.update();
     }
-
 }

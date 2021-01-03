@@ -5,12 +5,16 @@ project(bugs)
 set(CMAKE_CXX_STANDARD 20)
 
 find_package(SFML 2.5 REQUIRED network audio graphics window system)
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(OpenMP)
+find_library(LIB_CPPUNIT cppunit)
 
 if (SFML_FOUND)
     include_directories(${SFML_INCLUDE_DIR})
 else ()
     message(ERROR_FATAL "Can not find SFML")
 endif ()
+
 
 set(PACKAGES "${PROJECT_NAME}")
 
@@ -20,7 +24,6 @@ add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
 
 # Adding executable files in "bin"
-find_package(OpenMP)
 file(GLOB bin_files "${CMAKE_CURRENT_SOURCE_DIR}/bin/*.cpp")
 foreach (file ${bin_files})
     get_filename_component(file_name ${file} NAME_WLE)
@@ -30,12 +33,12 @@ foreach (file ${bin_files})
     target_link_libraries(${file_name} m)
 
     if (SFML_FOUND)
-        target_link_libraries(${file_name} ${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${PROJECT_NAME} sfml-graphics sfml-window sfml-system)
+        target_link_libraries(${file_name} ${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${PROJECT_NAME} sfml-graphics sfml-window sfml-system Eigen3::Eigen)
     endif ()
 
-    if(OpenMP_CXX_FOUND)
-        target_link_libraries(${file_name}  OpenMP::OpenMP_CXX)
-    endif()
+    if (OpenMP_CXX_FOUND)
+        target_link_libraries(${file_name} OpenMP::OpenMP_CXX)
+    endif ()
 endforeach ()
 
 # Adding header files in "include"
@@ -43,7 +46,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 # Adding unit tests in "test"
 file(GLOB test_files "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp")
-find_library(LIB_CPPUNIT cppunit)
 if (NOT LIB_CPPUNIT)
     message(FATAL_ERROR "cppunit not found")
 endif ()
@@ -55,7 +57,7 @@ foreach (file ${test_files})
     target_link_libraries(${file_name} ${PROJECT_NAME} m cppunit)
 
     if (SFML_FOUND)
-        target_link_libraries(${file_name} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${PROJECT_NAME} sfml-graphics sfml-window sfml-system)
+        target_link_libraries(${file_name} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${PROJECT_NAME} sfml-graphics sfml-window sfml-system Eigen3::Eigen)
     endif ()
 endforeach ()
 
