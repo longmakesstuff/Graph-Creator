@@ -1,0 +1,3 @@
+[submodule "TGUI"]
+	path = TGUI
+	url = git@github.com:texus/TGUI.git

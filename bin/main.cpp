@@ -1,9 +1,12 @@
 #include <SFML/Graphics.hpp>
+#include <TGUI/TGUI.hpp>
 #include <Graph.hpp>
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Graph Creator", sf::Style::Default);
     window.setFramerateLimit(30);
+
+    tgui::GuiSFML gui{window};
 
     sf::Font arial;
     arial.loadFromFile("arial.ttf");
@@ -18,7 +21,7 @@ int main() {
         .radius = 5
     };
 
-    Graph graph(&arial, &window, &config);
+    Graph graph(&arial, &window, &gui, &config);
     while (window.isOpen()) {
         graph.update();
     }

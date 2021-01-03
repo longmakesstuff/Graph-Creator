@@ -8,6 +8,7 @@ find_package(SFML 2.5 REQUIRED network audio graphics window system)
 find_package(Eigen3 3.3 REQUIRED)
 find_package(OpenMP)
 find_library(LIB_CPPUNIT cppunit)
+find_package(TGUI 0.9.0 REQUIRED)
 
 INCLUDE_DIRECTORIES ( "${EIGEN3_INCLUDE_DIR}" )
 
@@ -32,7 +33,7 @@ foreach (file ${bin_files})
 
     add_executable(${file_name} ${file})
 
-    target_link_libraries(${file_name} ${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${PROJECT_NAME} sfml-graphics sfml-window sfml-system Eigen3::Eigen m OpenMP::OpenMP_CXX)
+    target_link_libraries(${file_name} ${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${PROJECT_NAME} ${TGUI_LIBRARY} tgui sfml-graphics sfml-window sfml-system Eigen3::Eigen m OpenMP::OpenMP_CXX)
 endforeach ()
 
 # Adding header files in "include"
@@ -48,7 +49,7 @@ foreach (file ${test_files})
 
     add_executable(${file_name} ${file})
 
-    target_link_libraries(${file_name} ${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${PROJECT_NAME} sfml-graphics sfml-window sfml-system Eigen3::Eigen m OpenMP::OpenMP_CXX cppunit)
+    target_link_libraries(${file_name} ${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${PROJECT_NAME} ${TGUI_LIBRARY} sfml-graphics sfml-window sfml-system Eigen3::Eigen m OpenMP::OpenMP_CXX cppunit)
 endforeach ()
 
 # Copy resource files from from data to build directory

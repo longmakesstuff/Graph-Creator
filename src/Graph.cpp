@@ -1,6 +1,7 @@
 #include "Graph.hpp"
 
-Graph::Graph(sf::Font *font, sf::RenderWindow *window, Config *config) : font(font), window(window), config(config), polynomial(6) {
+Graph::Graph(sf::Font *font, sf::RenderWindow *window, tgui::GuiSFML *gui, Config *config) : font(font), window(window), gui(gui), config(config),
+                                                                         polynomial(6) {
     this->center = sf::Vector2f{config->centerX, config->centerY};
 }
 
@@ -37,15 +38,21 @@ void Graph::adjust() {
 void Graph::update() {
     this->timeElapsed = this->clock.restart().asMilliseconds();
 
-    while (window->pollEvent(this->event));
+    while (window->pollEvent(this->event)) {
+        gui->handleEvent(event);
+        if (event.type == sf::Event::Closed) {
+            window->close();
+        }
+    }
+
 
     // Adding new points to graph
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
         this->dataPoints.push_back(this->currentMouse());
+        this->adjust();
     }
 
     this->translateGraph();
-    this->adjust();
 
     window->clear(sf::Color::White);
     this->drawAxes();
@@ -53,6 +60,7 @@ void Graph::update() {
     this->drawGrids();
     this->drawDataPoints();
     this->drawCurve();
+    gui->draw();
     window->display();
 }
 
@@ -173,13 +181,13 @@ void Graph::drawCurve() {
     for (int32_t i = 0; i < xData.rows() - 1; i++) {
         sf::Vertex line[2];
         line[0].position = sf::Vector2f(xData(i), yData(i));
-        line[0].color  = sf::Color::Red;
+        line[0].color = sf::Color::Red;
         line[1].position = sf::Vector2f(xData(i + 1), yData(i + 1));
         line[1].color = sf::Color::Red;
         window->draw(line, 2, sf::PrimitiveType::Lines);
     }
 
-    if(!this->dataPoints.empty()) {
+    if (!this->dataPoints.empty()) {
         xData = Eigen::VectorXd(this->dataPoints.size());
 
         for (int32_t i = 0; i < this->dataPoints.size(); i++) {
@@ -192,7 +200,7 @@ void Graph::drawCurve() {
             sf::Vertex line[2];
 
             line[0].position = dataPoints[i];
-            line[0].color  = sf::Color::Blue;
+            line[0].color = sf::Color::Blue;
 
             line[1].position = sf::Vector2f(xData(i), yData(i));
             line[1].color = sf::Color::Blue;
@@ -202,18 +210,26 @@ void Graph::drawCurve() {
         }
 
 
-        fpt mae = 0;
-        for(int32_t i = 0; i < xData.size(); i++){
-            mae += std::abs(dataPoints[i].y - yData[i]);
+        if (this->dataPoints.size() > 1) {
+            fpt mae = this->mae(yData);
+
+            std::stringstream ss;
+            ss << "MAE: " << mae;
+
+            sf::Text meanAbsoluteError(ss.str(), *this->font, 15);
+            meanAbsoluteError.setPosition(5, 5);
+            meanAbsoluteError.setFillColor(sf::Color::Black);
+            window->draw(meanAbsoluteError);
         }
-        mae /= xData.size();
-
-        std::stringstream ss;
-        ss << "MAE: " << mae;
-
-        sf::Text meanAbsoluteError(ss.str(), *this->font, 15);
-        meanAbsoluteError.setPosition(5, 5);
-        meanAbsoluteError.setFillColor(sf::Color::Black);
-        window->draw(meanAbsoluteError);
     }
+}
+
+
+fpt Graph::mae(const Eigen::VectorXd &yHat) {
+    fpt mae = 0;
+    for (int32_t i = 0; i < yHat.size(); i++) {
+        mae += std::abs(dataPoints[i].y - yHat[i]);
+    }
+    mae /= yHat.size();
+    return mae;
 }

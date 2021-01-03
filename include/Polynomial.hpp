@@ -13,7 +13,7 @@ private:
 public:
     explicit Polynomial(uint32_t order);
 
-    [[nodiscard]] void fit(const Eigen::VectorXd& x, const Eigen::VectorXd& y);
+    void fit(const Eigen::VectorXd& x, const Eigen::VectorXd& y);
 
     [[nodiscard]] Eigen::VectorXd calculate(const Eigen::VectorXd& data) const;
 
