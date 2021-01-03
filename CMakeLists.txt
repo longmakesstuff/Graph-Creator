@@ -5,9 +5,11 @@ project(bugs)
 set(CMAKE_CXX_STANDARD 20)
 
 find_package(SFML 2.5 REQUIRED network audio graphics window system)
-find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(Eigen3 3.3 REQUIRED)
 find_package(OpenMP)
 find_library(LIB_CPPUNIT cppunit)
+
+INCLUDE_DIRECTORIES ( "${EIGEN3_INCLUDE_DIR}" )
 
 if (SFML_FOUND)
     include_directories(${SFML_INCLUDE_DIR})
@@ -30,15 +32,7 @@ foreach (file ${bin_files})
 
     add_executable(${file_name} ${file})
 
-    target_link_libraries(${file_name} m)
-
-    if (SFML_FOUND)
-        target_link_libraries(${file_name} ${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${PROJECT_NAME} sfml-graphics sfml-window sfml-system Eigen3::Eigen)
-    endif ()
-
-    if (OpenMP_CXX_FOUND)
-        target_link_libraries(${file_name} OpenMP::OpenMP_CXX)
-    endif ()
+    target_link_libraries(${file_name} ${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${PROJECT_NAME} sfml-graphics sfml-window sfml-system Eigen3::Eigen m OpenMP::OpenMP_CXX)
 endforeach ()
 
 # Adding header files in "include"
@@ -54,11 +48,7 @@ foreach (file ${test_files})
 
     add_executable(${file_name} ${file})
 
-    target_link_libraries(${file_name} ${PROJECT_NAME} m cppunit)
-
-    if (SFML_FOUND)
-        target_link_libraries(${file_name} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${PROJECT_NAME} sfml-graphics sfml-window sfml-system Eigen3::Eigen)
-    endif ()
+    target_link_libraries(${file_name} ${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${PROJECT_NAME} sfml-graphics sfml-window sfml-system Eigen3::Eigen m OpenMP::OpenMP_CXX cppunit)
 endforeach ()
 
 # Copy resource files from from data to build directory

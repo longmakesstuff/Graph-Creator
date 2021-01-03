@@ -1,6 +1,6 @@
 #include "Graph.hpp"
 
-Graph::Graph(sf::Font *font, sf::RenderWindow *window, Config *config) : font(font), window(window), config(config) {
+Graph::Graph(sf::Font *font, sf::RenderWindow *window, Config *config) : font(font), window(window), config(config), polynomial(6) {
     this->center = sf::Vector2f{config->centerX, config->centerY};
 }
 
@@ -19,9 +19,19 @@ void Graph::translateGraph() {
         translationVector.y -= this->timeElapsed;
     }
     this->center += translationVector;
-    for(auto & point : this->dataPoints){
+    for (auto &point : this->dataPoints) {
         point += translationVector;
     }
+}
+
+void Graph::adjust() {
+    Eigen::VectorXd xData(this->dataPoints.size());
+    Eigen::VectorXd yData(this->dataPoints.size());
+    for (int32_t i = 0; i < dataPoints.size(); i++) {
+        xData(i) = dataPoints[i].x;
+        yData(i) = dataPoints[i].y;
+    }
+    this->polynomial.fit(xData, yData);
 }
 
 void Graph::update() {
@@ -35,12 +45,14 @@ void Graph::update() {
     }
 
     this->translateGraph();
+    this->adjust();
 
     window->clear(sf::Color::White);
     this->drawAxes();
     this->drawTicks();
     this->drawGrids();
     this->drawDataPoints();
+    this->drawCurve();
     window->display();
 }
 
@@ -143,10 +155,65 @@ sf::Vector2f Graph::currentMouse() const {
 }
 
 void Graph::drawDataPoints() {
-    for(const auto& point : this->dataPoints) {
-        sf::CircleShape circle(5);
+    for (const auto &point : this->dataPoints) {
+        sf::CircleShape circle(this->config->radius);
         circle.setFillColor(sf::Color::Red);
-        circle.setPosition(point);
+        circle.setPosition(point.x - this->config->radius, point.y - this->config->radius);
         window->draw(circle);
+    }
+}
+
+void Graph::drawCurve() {
+    Eigen::VectorXd xData(this->config->sample);
+    for (int32_t i = 0; i < this->config->sample; i++) {
+        xData(i) = WINDOW_WIDTH / this->config->sample * i;
+    }
+
+    Eigen::VectorXd yData = this->polynomial.calculate(xData);
+    for (int32_t i = 0; i < xData.rows() - 1; i++) {
+        sf::Vertex line[2];
+        line[0].position = sf::Vector2f(xData(i), yData(i));
+        line[0].color  = sf::Color::Red;
+        line[1].position = sf::Vector2f(xData(i + 1), yData(i + 1));
+        line[1].color = sf::Color::Red;
+        window->draw(line, 2, sf::PrimitiveType::Lines);
+    }
+
+    if(!this->dataPoints.empty()) {
+        xData = Eigen::VectorXd(this->dataPoints.size());
+
+        for (int32_t i = 0; i < this->dataPoints.size(); i++) {
+            xData(i) = this->dataPoints[i].x;
+        }
+
+        yData = this->polynomial.calculate(xData);
+
+        for (int32_t i = 0; i < xData.rows() - 1; i++) {
+            sf::Vertex line[2];
+
+            line[0].position = dataPoints[i];
+            line[0].color  = sf::Color::Blue;
+
+            line[1].position = sf::Vector2f(xData(i), yData(i));
+            line[1].color = sf::Color::Blue;
+
+            window->draw(line, 2, sf::PrimitiveType::Lines);
+
+        }
+
+
+        fpt mae = 0;
+        for(int32_t i = 0; i < xData.size(); i++){
+            mae += std::abs(dataPoints[i].y - yData[i]);
+        }
+        mae /= xData.size();
+
+        std::stringstream ss;
+        ss << "MAE: " << mae;
+
+        sf::Text meanAbsoluteError(ss.str(), *this->font, 15);
+        meanAbsoluteError.setPosition(5, 5);
+        meanAbsoluteError.setFillColor(sf::Color::Black);
+        window->draw(meanAbsoluteError);
     }
 }

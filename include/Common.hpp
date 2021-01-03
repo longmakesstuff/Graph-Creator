@@ -4,9 +4,9 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-#define WINDOW_WIDTH 1600
+#define WINDOW_WIDTH 1000
 
-#define WINDOW_HEIGHT 1600
+#define WINDOW_HEIGHT 1000
 
 typedef float fpt;
 
@@ -28,6 +28,8 @@ typedef struct Config {
     fpt xTick;
     fpt yTick;
     fpt gridSize;
+    int32_t sample;
+    fpt radius;
 } Config;
 
 /* Maths */

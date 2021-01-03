@@ -13,7 +13,9 @@ int main() {
         .centerY = 100.0f,
         .xTick = 100.0f,
         .yTick = 100.0f,
-        .gridSize = 10.0f
+        .gridSize = 10.0f,
+        .sample = 100,
+        .radius = 5
     };
 
     Graph graph(&arial, &window, &config);

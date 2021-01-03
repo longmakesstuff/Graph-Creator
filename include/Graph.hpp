@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "Polynomial.hpp"
 #include "Common.hpp"
 
 class Graph {
@@ -13,6 +14,7 @@ private:
     sf::Clock clock;
     fpt timeElapsed = 0;
     std::vector<sf::Vector2f> dataPoints;
+    Polynomial polynomial;
 
     void drawAxes();
 
@@ -22,7 +24,11 @@ private:
 
     void drawDataPoints();
 
+    void drawCurve();
+
     void translateGraph();
+
+    void adjust();
 
     [[nodiscard]] sf::Vector2f currentMouse() const;
 
