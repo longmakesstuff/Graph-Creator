@@ -9,9 +9,10 @@ private:
     sf::RenderWindow *window;
     Config *config;
     sf::Vector2f center;
-    sf::Event event;
+    sf::Event event{};
     sf::Clock clock;
     fpt timeElapsed = 0;
+    std::vector<sf::Vector2f> dataPoints;
 
     void drawAxes();
 
@@ -19,9 +20,12 @@ private:
 
     void drawGrids();
 
+    void drawDataPoints();
+
     void translateGraph();
 
     [[nodiscard]] sf::Vector2f currentMouse() const;
+
 public:
     Graph(sf::Font *font, sf::RenderWindow *window, Config *config);
 

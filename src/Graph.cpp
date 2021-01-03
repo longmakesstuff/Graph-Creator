@@ -5,24 +5,34 @@ Graph::Graph(sf::Font *font, sf::RenderWindow *window, Config *config) : font(fo
 }
 
 void Graph::translateGraph() {
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)){
-        this->center.x += this->timeElapsed;
+    sf::Vector2f translationVector{0, 0};
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+        translationVector.x += this->timeElapsed;
     }
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)){
-        this->center.x -= this->timeElapsed;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+        translationVector.x -= this->timeElapsed;
     }
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)){
-        this->center.y += this->timeElapsed;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+        translationVector.y += this->timeElapsed;
     }
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)){
-        this->center.y -= this->timeElapsed;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+        translationVector.y -= this->timeElapsed;
+    }
+    this->center += translationVector;
+    for(auto & point : this->dataPoints){
+        point += translationVector;
     }
 }
 
 void Graph::update() {
     this->timeElapsed = this->clock.restart().asMilliseconds();
 
-    while (window->pollEvent(this->event)) {}
+    while (window->pollEvent(this->event));
+
+    // Adding new points to graph
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        this->dataPoints.push_back(this->currentMouse());
+    }
 
     this->translateGraph();
 
@@ -30,9 +40,9 @@ void Graph::update() {
     this->drawAxes();
     this->drawTicks();
     this->drawGrids();
+    this->drawDataPoints();
     window->display();
 }
-
 
 void Graph::drawGrids() {
     sf::Color gridColor{150, 150, 150, 150};
@@ -130,4 +140,13 @@ void Graph::drawTicks() {
 sf::Vector2f Graph::currentMouse() const {
     sf::Vector2i pos = sf::Mouse::getPosition(*this->window);
     return sf::Vector2f{(float) pos.x, (float) pos.y};
+}
+
+void Graph::drawDataPoints() {
+    for(const auto& point : this->dataPoints) {
+        sf::CircleShape circle(5);
+        circle.setFillColor(sf::Color::Red);
+        circle.setPosition(point);
+        window->draw(circle);
+    }
 }
