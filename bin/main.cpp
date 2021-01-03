@@ -12,8 +12,8 @@ int main() {
     arial.loadFromFile("arial.ttf");
 
     Config config{
-        .centerX = 100.0f,
-        .centerY = 100.0f,
+        .centerX = 150.0f,
+        .centerY = 150.0f,
         .xTick = 100.0f,
         .yTick = 100.0f,
         .gridSize = 10.0f,

@@ -3,6 +3,16 @@
 Graph::Graph(sf::Font *font, sf::RenderWindow *window, tgui::GuiSFML *gui, Config *config) : font(font), window(window), gui(gui), config(config),
                                                                          polynomial(6) {
     this->center = sf::Vector2f{config->centerX, config->centerY};
+    this->gui->add(slider);
+    this->slider->setValue(6);
+    slider->setWidgetName("Polynom slider");
+    slider->setSize(250, 15);
+    slider->setPosition(WINDOW_WIDTH - 260, WINDOW_HEIGHT - 25);
+    slider->onValueChange([&]{
+        int32_t order = slider->getValue();
+        this->polynomial = Polynomial(order);
+        this->adjust();
+    });
 }
 
 void Graph::translateGraph() {
@@ -47,7 +57,7 @@ void Graph::update() {
 
 
     // Adding new points to graph
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
         this->dataPoints.push_back(this->currentMouse());
         this->adjust();
     }
@@ -55,11 +65,13 @@ void Graph::update() {
     this->translateGraph();
 
     window->clear(sf::Color::White);
+    this->drawMousePosition();
     this->drawAxes();
     this->drawTicks();
     this->drawGrids();
     this->drawDataPoints();
     this->drawCurve();
+    this->info();
     gui->draw();
     window->display();
 }
@@ -214,16 +226,25 @@ void Graph::drawCurve() {
             fpt mae = this->mae(yData);
 
             std::stringstream ss;
-            ss << "MAE: " << mae;
+            ss << "Absolute error: " << mae;
 
-            sf::Text meanAbsoluteError(ss.str(), *this->font, 15);
-            meanAbsoluteError.setPosition(5, 5);
-            meanAbsoluteError.setFillColor(sf::Color::Black);
+            sf::Text meanAbsoluteError(ss.str(), *this->font, 20);
+            meanAbsoluteError.setPosition(15, 15);
+            meanAbsoluteError.setFillColor(sf::Color::Blue);
             window->draw(meanAbsoluteError);
         }
     }
 }
 
+void Graph::info() {
+    std::stringstream ss;
+    ss << "Polynomial's order: " << this->slider->getValue();
+
+    sf::Text polynomialOrder(ss.str(), *this->font, 17);
+    polynomialOrder.setPosition(WINDOW_WIDTH - 260, WINDOW_HEIGHT - 50);
+    polynomialOrder.setFillColor(sf::Color::Blue);
+    window->draw(polynomialOrder);
+}
 
 fpt Graph::mae(const Eigen::VectorXd &yHat) {
     fpt mae = 0;
@@ -232,4 +253,7 @@ fpt Graph::mae(const Eigen::VectorXd &yHat) {
     }
     mae /= yHat.size();
     return mae;
+}
+
+void Graph::drawMousePosition() {
 }

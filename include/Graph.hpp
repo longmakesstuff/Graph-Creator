@@ -17,6 +17,7 @@ private:
     fpt timeElapsed = 0;
     std::vector<sf::Vector2f> dataPoints;
     Polynomial polynomial;
+    tgui::Slider::Ptr slider = tgui::Slider::create(0, 15);
 
     void drawAxes();
 
@@ -31,6 +32,10 @@ private:
     void translateGraph();
 
     void adjust();
+
+    void info();
+
+    void drawMousePosition();
 
     [[nodiscard]] sf::Vector2f currentMouse() const;
 
