@@ -1,14 +1,15 @@
 #include "Graph.hpp"
 
-Graph::Graph(sf::Font *font, sf::RenderWindow *window, tgui::GuiSFML *gui, Config *config) : font(font), window(window), gui(gui), config(config),
-                                                                         polynomial(6) {
+Graph::Graph(sf::Font *font, sf::RenderWindow *window, tgui::GuiSFML *gui, Config *config) : font(font), window(window),
+                                                                                             gui(gui), config(config),
+                                                                                             polynomial(2) {
     this->center = sf::Vector2f{config->centerX, config->centerY};
     this->gui->add(slider);
-    this->slider->setValue(6);
+    this->slider->setValue(2);
     slider->setWidgetName("Polynom slider");
     slider->setSize(250, 15);
     slider->setPosition(WINDOW_WIDTH - 260, WINDOW_HEIGHT - 25);
-    slider->onValueChange([&]{
+    slider->onValueChange([&] {
         int32_t order = slider->getValue();
         this->polynomial = Polynomial(order);
         this->adjust();
@@ -184,22 +185,22 @@ void Graph::drawDataPoints() {
 }
 
 void Graph::drawCurve() {
-    Eigen::VectorXd xData(this->config->sample);
-    for (int32_t i = 0; i < this->config->sample; i++) {
-        xData(i) = WINDOW_WIDTH / this->config->sample * i;
-    }
-
-    Eigen::VectorXd yData = this->polynomial.calculate(xData);
-    for (int32_t i = 0; i < xData.rows() - 1; i++) {
-        sf::Vertex line[2];
-        line[0].position = sf::Vector2f(xData(i), yData(i));
-        line[0].color = sf::Color::Red;
-        line[1].position = sf::Vector2f(xData(i + 1), yData(i + 1));
-        line[1].color = sf::Color::Red;
-        window->draw(line, 2, sf::PrimitiveType::Lines);
-    }
-
     if (!this->dataPoints.empty()) {
+        Eigen::VectorXd xData(this->config->sample);
+        for (int32_t i = 0; i < this->config->sample; i++) {
+            xData(i) = WINDOW_WIDTH / this->config->sample * i;
+        }
+
+        Eigen::VectorXd yData = this->polynomial.calculate(xData);
+        for (int32_t i = 0; i < xData.rows() - 1; i++) {
+            sf::Vertex line[2];
+            line[0].position = sf::Vector2f(xData(i), yData(i));
+            line[0].color = sf::Color::Red;
+            line[1].position = sf::Vector2f(xData(i + 1), yData(i + 1));
+            line[1].color = sf::Color::Red;
+            window->draw(line, 2, sf::PrimitiveType::Lines);
+        }
+
         xData = Eigen::VectorXd(this->dataPoints.size());
 
         for (int32_t i = 0; i < this->dataPoints.size(); i++) {
@@ -256,4 +257,17 @@ fpt Graph::mae(const Eigen::VectorXd &yHat) {
 }
 
 void Graph::drawMousePosition() {
+    sf::Color fill{0, 255, 0, 100};
+    sf::Vector2f mousePos = this->currentMouse();
+
+    sf::RectangleShape vertical(sf::Vector2f(1, WINDOW_HEIGHT));
+    vertical.setFillColor(fill);
+    vertical.setPosition(mousePos.x, 0);
+
+    sf::RectangleShape horizontal(sf::Vector2f(WINDOW_WIDTH, 1));
+    horizontal.setFillColor(fill);
+    horizontal.setPosition(0, mousePos.y);
+
+    this->window->draw(vertical);
+    this->window->draw(horizontal);
 }
