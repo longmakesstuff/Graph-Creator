@@ -2,10 +2,10 @@
 
 Graph::Graph(sf::Font *font, sf::RenderWindow *window, tgui::GuiSFML *gui, Config *config) : font(font), window(window),
                                                                                              gui(gui), config(config),
-                                                                                             polynomial(2) {
+                                                                                             polynomial(0) {
     this->center = sf::Vector2f{config->centerX, config->centerY};
     this->gui->add(slider);
-    this->slider->setValue(2);
+    this->slider->setValue(0);
     slider->setWidgetName("Polynom slider");
     slider->setSize(250, 15);
     slider->setPosition(WINDOW_WIDTH - 260, WINDOW_HEIGHT - 25);
@@ -66,10 +66,10 @@ void Graph::update() {
     this->translateGraph();
 
     window->clear(sf::Color::White);
-    this->drawMousePosition();
+    //this->drawMousePosition();
     this->drawAxes();
     this->drawTicks();
-    this->drawGrids();
+    //this->drawGrids();
     this->drawDataPoints();
     this->drawCurve();
     this->info();
@@ -207,6 +207,7 @@ void Graph::drawCurve() {
             xData(i) = this->dataPoints[i].x;
         }
 
+/*
         yData = this->polynomial.calculate(xData);
 
         for (int32_t i = 0; i < xData.rows() - 1; i++) {
@@ -219,9 +220,7 @@ void Graph::drawCurve() {
             line[1].color = sf::Color::Blue;
 
             window->draw(line, 2, sf::PrimitiveType::Lines);
-
         }
-
 
         if (this->dataPoints.size() > 1) {
             fpt mae = this->mae(yData);
@@ -233,7 +232,7 @@ void Graph::drawCurve() {
             meanAbsoluteError.setPosition(15, 15);
             meanAbsoluteError.setFillColor(sf::Color::Blue);
             window->draw(meanAbsoluteError);
-        }
+        }*/
     }
 }
 
@@ -243,7 +242,7 @@ void Graph::info() {
 
     sf::Text polynomialOrder(ss.str(), *this->font, 17);
     polynomialOrder.setPosition(WINDOW_WIDTH - 260, WINDOW_HEIGHT - 50);
-    polynomialOrder.setFillColor(sf::Color::Blue);
+    polynomialOrder.setFillColor(sf::Color::Black);
     window->draw(polynomialOrder);
 }
 
