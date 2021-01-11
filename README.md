@@ -11,5 +11,7 @@ applies for crazier shape. But if the polynomial is too higher, chance is the fi
 
 ![](data/output.gif)
 
+This project was made mainly for me to practice some C++, which is my favorite language in the current time.
+
 ### References
 - [Polynomial interpolation](https://en.wikipedia.org/wiki/Polynomial_interpolation)
